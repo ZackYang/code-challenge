@@ -10,4 +10,5 @@ gem "nokogiri"
 group :development, :test do
   gem "rspec"
   gem "faker"
+  gem "pry"
 end
