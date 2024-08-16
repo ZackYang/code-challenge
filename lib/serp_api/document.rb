@@ -9,6 +9,14 @@ module SerpApi
       load_page
     end
 
+    def query(selector, mode = :css)
+      if mode == :css
+        @doc.css(selector)
+      elsif mode == :xpath
+        @doc.xpath(selector)
+      end
+    end
+
     def self.load(page_path)
       new(page_path).doc
 
