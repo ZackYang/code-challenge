@@ -6,7 +6,7 @@ Goal is to extract a list of Van Gogh paintings from the attached Google search 
 
 ## Instructions
 
-This is already fully supported on SerpApi. ([relevant test], [html file], [sample json], and [expected array].)
+This is already fully supported on SerpExtractor. ([relevant test], [html file], [sample json], and [expected array].)
 Try to come up with your own solution and your own test.
 Extract the painting `name`, `extensions` array (date), and Google `link` in an array.
 
@@ -21,7 +21,7 @@ Parse directly the HTML result page ([html file]) in this repository. No extra H
 [html file]: https://raw.githubusercontent.com/serpapi/code-challenge/master/files/van-gogh-paintings.html
 [expected array]: https://raw.githubusercontent.com/serpapi/code-challenge/master/files/expected-array.json
 
-Add also to your array the painting thumbnails present in the result page file (not the ones where extra requests are needed). 
+Add also to your array the painting thumbnails present in the result page file (not the ones where extra requests are needed).
 
 Test against 2 other similar result pages to make sure it works against different layouts. (Pages that contain the same kind of carrousel. Don't necessarily have to be paintings.)
 
