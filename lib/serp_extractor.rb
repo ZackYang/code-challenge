@@ -11,7 +11,7 @@ module SerpExtractor
     attr_accessor :logger, :root_path
   end
 
-  self.logger = Logger.new(STDOUT)
+  self.logger = Logger.new($stdout)
   logger.level = Logger::INFO
   self.root_path = File.expand_path("..", __dir__)
 
