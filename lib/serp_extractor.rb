@@ -18,7 +18,13 @@ module SerpExtractor
   def self.path_to(*path)
     File.join(root_path, *path)
   end
+
+  def self.extract(file_path, strategy: nil)
+    Document.new(file_path, strategy:).extract
+  end
 end
 
 require_relative "serp_extractor/element"
 require_relative "serp_extractor/document"
+require_relative "serp_extractor/extract_strategies/base"
+require_relative "serp_extractor/extract_strategies/google_carousel"

@@ -2,22 +2,45 @@ require "nokogiri"
 
 module SerpExtractor
   class Document
-    attr_reader :doc, :elements
+    attr_reader :doc
 
     def initialize(page_path)
       @page_path = page_path
-      @elements = []
       load_page
     end
 
-    def query(selector, mode = :css)
+    # pasring_strategy should contains the following
+    # {
+    #   node_set_selector: XPATH | CSS_SELECTOR,
+    #   node_set_selector_mode: :xpath | :css,
+    #   attributes: {
+    #     attribute_name: {
+    #       xpath: xpath,
+    #       is_array: true | false,
+    #       type: :text | :attribute,
+    #       attribute: attribute_name
+    #     }
+    #   }
+    # }
+    #  please refer to lib/serp_extractor/selector_strategies/google_carousel.rb for an example
+    def extract_by_strategy(strategy)
+      elements = query(strategy.node_set_selector, strategy.node_set_selector_mode)
+      elements.map do |element|
+        element.extract(strategy)
+      end
+    end
+
+    # returns an array of Element objects that match the selector
+    def query(selector, mode = :xpath)
+      elements = []
       case mode
       when :css
-        @elements = @doc.css(selector)
+        elements = @doc.css(selector)
       when :xpath
-        @elements = @doc.xpath(selector)
+        elements = @doc.xpath(selector)
       end
-      @elements = @elements.map { |element| Element.new(element) }
+      binding.pry
+      elements.map { |element| Element.new(element) }
     end
 
     def self.load(page_path)
@@ -30,7 +53,7 @@ module SerpExtractor
     private
 
     def load_page
-      @doc = Nokogiri::HTML.parse(File.open(@page_path))
+      @doc = Nokogiri::HTML.parse(File.open(@page_path), nil, "utf-8")
     end
   end
 end

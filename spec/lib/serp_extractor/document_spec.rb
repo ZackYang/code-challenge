@@ -11,7 +11,7 @@ RSpec.describe SerpExtractor::Document do
     end
 
     it "loads the page using Nokogiri::HTML" do
-      expect(Nokogiri::HTML).to receive(:parse).with("<html><body></body></html>")
+      expect(Nokogiri::HTML).to receive(:parse).with("<html><body></body></html>", nil, "utf-8")
       SerpExtractor::Document.load(page_path)
     end
 
@@ -43,11 +43,11 @@ RSpec.describe SerpExtractor::Document do
 
     context "when mode is :css" do
       it "returns am array of elements" do
-        expect(SerpExtractor::Document.new(page_path).query(css_selector)[0].element).to be_a(Nokogiri::XML::Element)
+        expect(SerpExtractor::Document.new(page_path).query(css_selector, :css)[0].element).to be_a(Nokogiri::XML::Element)
       end
 
       it "returns the content of the element with the attribute 'aria-label' equal to 'The Starry Night'" do
-        value = SerpExtractor::Document.new(page_path).query(css_selector)[0].element.attribute_nodes.find do |node|
+        value = SerpExtractor::Document.new(page_path).query(css_selector, :css)[0].element.attribute_nodes.find do |node|
           node.name == "aria-label"
         end.value
 
@@ -67,6 +67,68 @@ RSpec.describe SerpExtractor::Document do
 
         expect(value).to eq(node_content)
       end
+    end
+  end
+
+  describe "#extract_by_strategy" do
+    let(:page_path) { SerpExtractor.path_to("/spec/fixtures/van-gogh-paintings.html") }
+    let(:attributes) do
+      [
+        {
+          name: "name",
+          xpath: ".",
+          type: :attribute,
+          attribute: "aria-label"
+        },
+        {
+          name: "link",
+          xpath: ".",
+          type: :attribute,
+          attribute: "href",
+          result_prefix: "https://www.google.com"
+        },
+        {
+          name: "image",
+          xpath: ".//g-img/img[@src]",
+          type: :attribute,
+          attribute: "src"
+        },
+        {
+          name: "extensions",
+          xpath: ".//div[@class='ellip klmeta']",
+          is_array: true
+        }
+      ]
+    end
+
+    let(:strategy) do
+      double(
+        "Strategy",
+        node_set_selector: "//g-scrolling-carousel//a[@aria-label]",
+        node_set_selector_mode: :xpath,
+        attributes:
+      )
+    end
+
+    let(:html) { File.read(page_path) }
+
+    before do
+      allow(File).to receive(:open).with(page_path).and_return(html)
+    end
+
+    it "returns an array of hashes" do
+      expect(SerpExtractor::Document.new(page_path).extract_by_strategy(strategy)).to be_an(Array)
+    end
+
+    it "returns an array of hashes with the expected keys" do
+      result = SerpExtractor::Document.new(page_path).extract_by_strategy(strategy)
+      keys = result[0].keys
+      puts result
+      expect(keys).to include("name", "link", "extensions")
+      expect(result[0]["name"]).to eq("The Starry Night")
+      expect(result[0]["link"]).to eq("https://www.google.com/search?gl=us&hl=en&q=The+Starry+Night&stick=H4sIAAAAAAAAAONgFuLQz9U3MI_PNVLiBLFMzC3jC7WUspOt9Msyi0sTc-ITi0qQmJnFJVbl-UXZxY8YI7kFXv64JywVMGnNyWuMXlxEaBJS4WJzzSvJLKkUkuLikYLbrcEgxcUF5_EsYhUIyUhVCC5JLCqqVPDLTM8oAQDmNFnDqgAAAA&npsic=0&sa=X&ved=0ahUKEwiL2_Hon4_hAhXNZt4KHTOAACwQ-BYILw")
+      expect(result[0]["image"]).to start_with("data:image/jpeg;base64")
+      expect(result[0]["extensions"]).to eq(["1889"])
     end
   end
 end

@@ -7,7 +7,7 @@ RSpec.describe SerpExtractor::Element do
       <div class="klzc" style="margin-bottom:0">
           <div class="klic" style="height:120px;width:120px">
             <g-img class="BA0A6c" style="height:120px;width:120px">
-              <img data-key="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQq3gOqqnprlNb3SdEgrKAR_0sWrsu0kO0aNnwE3yRwmA_cf-PvBvdz4eInim3FDmRn7E0" id="kximg0"
+              <img src="data:image/jpeg;base64,/9j" data-key="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQq3gOqqnprlNb3SdEgrKAR_0sWrsu0kO0aNnwE3yRwmA_cf-PvBvdz4eInim3FDmRn7E0" id="kximg0"
             </g-img>
           </div>
       </div>
@@ -86,6 +86,50 @@ RSpec.describe SerpExtractor::Element do
 
         expect(subject.fields["year"]).to eq("1889")
       end
+    end
+  end
+
+  describe "#extract" do
+    let(:strategy) { double(attributes: strategy_attributes) }
+    let(:strategy_attributes) do
+      [
+        {
+          name: "name",
+          xpath: ".",
+          type: :attribute,
+          attribute: "aria-label"
+        },
+        {
+          name: "link",
+          xpath: ".",
+          type: :attribute,
+          attribute: "href",
+          result_prefix: "https://www.google.com"
+        },
+        {
+          name: "image",
+          xpath: ".//div/g-img/img[@src]",
+          type: :attribute,
+          attribute: "src"
+        },
+        {
+          name: "extensions",
+          xpath: ".//div[@class='ellip klmeta']",
+          type: :text,
+          is_array: true
+        }
+      ]
+    end
+
+    it "returns a hash with the extracted fields" do
+      expect(subject.extract(strategy)).to eq(
+        {
+          "name" => "The Starry Night",
+          "link" => "https://www.google.com/search?gl=us&hl=en&q=The+Starry+Night&stick=H4sIAAAAAAAAAONgFuLQz9U3MI_PNVLiBLFMzC3jC7WUspOt9Msyi0sTc-ITi0qQmJnFJVbl-UXZxY8YI7kFXv64JywVMGnNyWuMXlxEaBJS4WJzzSvJLKkUkuLikYLbrcEgxcUF5_EsYhUIyUhVCC5JLCqqVPDLTM8oAQDmNFnDqgAAAA&npsic=0&sa=X&ved=0ahUKEwiL2_Hon4_hAhXNZt4KHTOAACwQ-BYILw",
+          "image" => "data:image/jpeg;base64,/9j",
+          "extensions" => ["1889"]
+        }
+      )
     end
   end
 end

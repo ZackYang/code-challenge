@@ -10,26 +10,47 @@ module SerpExtractor
       @fields = {}
     end
 
-    def query_field(field)
-      name = field[:name]
-      xpath = field[:xpath]
-      type = field[:type]
-      is_array = field[:is_array]
+    def extract(strategy)
+      result = {}
+      strategy.attributes.map do |options|
+        result[options[:name]] = query_field(options)
+        result[options[:name]] = apply_result_prefix(result[options[:name]], options[:result_prefix]) if options[:result_prefix].present?
+        result.delete(options[:name]) if options[:remove_when_blank] && result[options[:name]].blank?
+      end
+      result
+    end
 
-      if xpath.is_a?(Array)
-        xpath.each do |x|
-          query_field(name:, xpath: x, type:, is_array:)
+    def query_field(field)
+      if field[:xpath].is_a?(Array)
+        field[:xpath].each do |x|
+          query_field(field.merge(xpath: x))
         end
       end
+      binding.pry
+      node = @element.xpath(field[:xpath])
+      return if @fields[field[:name]].present?
 
-      node = @element.xpath(xpath)
-      return if @fields[name].present?
+      @fields[field[:name]] = if field[:type] == :attribute
+                                node.attribute(field[:attribute])&.value
+                              else
+                                field[:is_array] ? node.map(&:text) : node.text
+                              end
+    rescue StandardError => e
+      SerpExtractor.logger.info("Field: #{field[:name]}")
+      SerpExtractor.logger.info(@element)
+      SerpExtractor.logger.error(e.message)
+    end
 
-      @fields[name] = if type == :attribute
-                        node.attribute(field[:attribute]).value
-                      else
-                        is_array ? node.map(&:text) : node.text
-                      end
+    private
+
+    def apply_result_prefix(value, prefix)
+      return value unless prefix.present?
+
+      if value.is_a?(Array)
+        value.map { |v| prefix + v }
+      elsif value.is_a?(String)
+        prefix + value
+      end
     end
   end
 end
