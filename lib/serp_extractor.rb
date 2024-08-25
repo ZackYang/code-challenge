@@ -24,6 +24,7 @@ module SerpExtractor
   end
 end
 
+require_relative "serp_extractor/web_context"
 require_relative "serp_extractor/element"
 require_relative "serp_extractor/document"
 require_relative "serp_extractor/extract_strategies/base"
