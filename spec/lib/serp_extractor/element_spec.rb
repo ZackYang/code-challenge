@@ -104,7 +104,7 @@ RSpec.describe SerpExtractor::Element do
           xpath: ".",
           type: :attribute,
           attribute: "href",
-          result_prefix: "https://www.google.com"
+          handler: ->(value) { "https://www.google.com#{value}" }
         },
         {
           name: "image",

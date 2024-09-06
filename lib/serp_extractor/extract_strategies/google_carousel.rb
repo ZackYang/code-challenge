@@ -22,18 +22,23 @@ module SerpExtractor
             xpath: ".",
             type: :attribute,
             attribute: "href",
-            result_prefix: "https://www.google.com"
+            handler: lambda do |value|
+              if value.start_with?("/")
+                "https://www.google.com#{value}"
+              else
+                value
+              end
+            end
           },
           {
             name: "image",
             xpath: ".//img",
             type: :attribute,
-            attribute: "src",
-            handler: ->(value) { CGI.escape(value) }
+            attribute: "src"
           },
           {
             name: "extensions",
-            xpath: ".//div[@class='ellip klmeta']",
+            xpath: ".//div[@class='ellip klmeta'] | .//div[@class='cp7THd']/div[@class='FozYP']",
             type: :text,
             is_array: true,
             remove_when_blank: true

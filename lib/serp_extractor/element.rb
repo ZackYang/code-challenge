@@ -14,7 +14,7 @@ module SerpExtractor
       result = {}
       strategy.attributes.map do |options|
         result[options[:name]] = query_field(options)
-        result[options[:name]] = apply_result_prefix(result[options[:name]], options[:result_prefix]) if options[:result_prefix].present?
+        result[options[:name]] = apply_handler(result[options[:name]], options[:handler])
         result.delete(options[:name]) if options[:remove_when_blank] && result[options[:name]].blank?
       end
       result
@@ -34,7 +34,6 @@ module SerpExtractor
                               else
                                 field[:is_array] ? node.map(&:text) : node.text
                               end
-
     rescue StandardError => e
       SerpExtractor.logger.info("Field: #{field[:name]}")
       SerpExtractor.logger.info(@element)
@@ -43,13 +42,15 @@ module SerpExtractor
 
     private
 
-    def apply_result_prefix(value, prefix)
-      return value unless prefix.present?
+    def apply_handler(value, handler)
+      return value unless handler.present?
 
       if value.is_a?(Array)
-        value.map { |v| prefix + v }
+        value.map { |v| handler.call(v) }
       elsif value.is_a?(String)
-        prefix + value
+        handler.call(value)
+      else
+        value
       end
     end
   end

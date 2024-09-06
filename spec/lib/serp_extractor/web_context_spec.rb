@@ -9,7 +9,7 @@ RSpec.describe SerpExtractor::WebContext do
   describe "#run" do
     it "navigates to the page using the Selenium driver" do
       expect(driver).to receive(:get).with("file://#{SerpExtractor.path_to(page_path)}")
-      web_context.run {}
+      web_context.run { puts "Inside the block" }
     end
 
     it "calls the provided block with the Selenium driver" do
@@ -19,6 +19,14 @@ RSpec.describe SerpExtractor::WebContext do
         expect(driver).to eq(driver)
       end
       expect(block_called).to be true
+    end
+
+    it "finds the title" do
+      web_context.run do |driver|
+        current_title = driver.title
+
+        expect(current_title).to eq("Van Gogh paintings - Google Search")
+      end
     end
   end
 end
