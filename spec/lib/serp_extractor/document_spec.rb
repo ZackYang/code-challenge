@@ -10,11 +10,6 @@ RSpec.describe SerpExtractor::Document do
       allow(Nokogiri::HTML).to receive(:parse).and_return(document)
     end
 
-    it "loads the page using Nokogiri::HTML" do
-      expect(Nokogiri::HTML).to receive(:parse).with("<html><body></body></html>", nil, "utf-8")
-      SerpExtractor::Document.load(page_path)
-    end
-
     it "returns the loaded document" do
       expect(SerpExtractor::Document.load(page_path)).to eq(document)
     end

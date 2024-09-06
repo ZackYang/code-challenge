@@ -39,7 +39,6 @@ module SerpExtractor
       when :xpath
         elements = @doc.xpath(selector)
       end
-      binding.pry
       elements.map { |element| Element.new(element) }
     end
 
@@ -53,7 +52,9 @@ module SerpExtractor
     private
 
     def load_page
-      @doc = Nokogiri::HTML.parse(File.open(@page_path), nil, "utf-8")
+      WebContext.new(@page_path).run do |driver|
+        @doc = Nokogiri::HTML.parse(driver.page_source, nil, "utf-8")
+      end
     end
   end
 end

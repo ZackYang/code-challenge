@@ -28,7 +28,8 @@ module SerpExtractor
             name: "image",
             xpath: ".//img",
             type: :attribute,
-            attribute: "src"
+            attribute: "src",
+            handler: ->(value) { CGI.escape(value) }
           },
           {
             name: "extensions",

@@ -26,7 +26,6 @@ module SerpExtractor
           query_field(field.merge(xpath: x))
         end
       end
-      binding.pry
       node = @element.xpath(field[:xpath])
       return if @fields[field[:name]].present?
 
@@ -35,6 +34,7 @@ module SerpExtractor
                               else
                                 field[:is_array] ? node.map(&:text) : node.text
                               end
+
     rescue StandardError => e
       SerpExtractor.logger.info("Field: #{field[:name]}")
       SerpExtractor.logger.info(@element)
