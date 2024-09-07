@@ -16,11 +16,14 @@ module SerpExtractor
   self.root_path = File.expand_path("..", __dir__)
 
   def self.path_to(*path)
+    # Check if the path is already absolute
+    return path if path.first.start_with?("/")
+
     File.join(root_path, *path)
   end
 
   def self.extract(file_path, strategy: nil)
-    Document.new(file_path, strategy:).extract
+    Document.new(file_path).extract_by_strategy(strategy)
   end
 end
 

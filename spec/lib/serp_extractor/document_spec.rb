@@ -26,7 +26,7 @@ RSpec.describe SerpExtractor::Document do
   end
 
   describe "#query" do
-    let(:page_path) { SerpExtractor.path_to("/spec/fixtures/van-gogh-paintings.html") }
+    let(:page_path) { SerpExtractor.path_to("spec/fixtures/van-gogh-paintings.html") }
     let(:css_selector) { "g-scrolling-carousel a" }
     let(:xpath_selector) { "//g-scrolling-carousel//a" }
     let(:node_content) { "The Starry Night" }
@@ -66,7 +66,7 @@ RSpec.describe SerpExtractor::Document do
   end
 
   describe "#extract_by_strategy" do
-    let(:page_path) { SerpExtractor.path_to("/spec/fixtures/van-gogh-paintings.html") }
+    let(:page_path) { SerpExtractor.path_to("spec/fixtures/van-gogh-paintings.html") }
     let(:attributes) do
       [
         {

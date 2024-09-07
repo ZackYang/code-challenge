@@ -30,7 +30,6 @@ RSpec.describe "Extract Google Carousel" do
       elements = document.extract_by_strategy(strategy)
       expect(elements.size).to eq(49)
       first_element = elements.first
-      puts first_element
       expect(first_element["link"]).to eq(link)
       expect(first_element["name"]).to eq("Christopher Luxon")
       expect(first_element["extensions"]).to eq(["2023-"])
